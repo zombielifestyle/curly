@@ -89,7 +89,10 @@ class Curly {
         $parsedResponse = $this->parseResponse($response);
         $parsedResponse['info'] = curl_getinfo($c);
         curl_close($c);
-        $parsedResponse['cookies'] = $this->parseCookies(file_get_contents($this->cookieFile));
+        $parsedResponse['cookies'] = array();
+        if (is_file($this->cookieFile)) {
+            $parsedResponse['cookies'] = $this->parseCookies(file_get_contents($this->cookieFile));
+        }
         $this->emit('response', array($parsedResponse));
         return $parsedResponse;
     }
@@ -105,6 +108,14 @@ class Curly {
         return $this->request(array(
             CURLOPT_URL => $url,
             CURLOPT_CUSTOMREQUEST => 'POST',
+            CURLOPT_POSTFIELDS => $data,
+        ));
+    }
+
+    function put($url, $data = array()) {
+        return $this->request(array(
+            CURLOPT_URL => $url,
+            CURLOPT_CUSTOMREQUEST => 'PUT',
             CURLOPT_POSTFIELDS => $data,
         ));
     }
